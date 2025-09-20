@@ -44,25 +44,25 @@ jobs:
             echo "new_updates=false" >> $GITHUB_ENV
           fi
 
-      # 5. Merge updates, exclude workflows, create tag
+      # 5. Merge updates, exclude .github/, create tag
       - name: Merge updates & tag
         if: env.new_updates == 'true'
         run: |
           git checkout main
           # Merge upstream changes
           git merge upstream/main --allow-unrelated-histories -m "Merge upstream updates" || { echo "Merge failed"; exit 1; }
-          # Discard changes to .github/workflows/ from upstream
-          git restore --source=origin/main -- .github/workflows/ || true
-          # Stage any changes (excluding workflows, which were restored)
+          # Discard changes to .github/ from upstream
+          git restore --source=origin/main -- .github/ || true
+          # Stage all changes (excluding .github/, which was restored)
           git add .
-          # Commit to ensure the restored state is included
-          git commit --allow-empty -m "Merge upstream updates, excluding workflow files"
+          # Commit to include the restored state
+          git commit --allow-empty -m "Merge upstream updates, excluding .github/ directory"
           # Create a timestamped tag
           TAG=v$(date +'%Y.%m.%d-%H%M')
           git tag $TAG
-          # Push commits and tags
+          # Push commits and only the new tag
           git push origin main
-          git push origin --tags
+          git push origin $TAG
           echo "TAG=$TAG" >> $GITHUB_ENV
 
       # 6. Send Discord Notification
