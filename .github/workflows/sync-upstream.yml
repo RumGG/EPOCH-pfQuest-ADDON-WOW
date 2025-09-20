@@ -6,7 +6,7 @@ on:
   workflow_dispatch:       # Manual trigger
 
 permissions:
-  contents: write  # Allows pushing commits and tags
+  contents: write  # Required to push commits and tags
 
 jobs:
   sync:
@@ -50,7 +50,7 @@ jobs:
           git checkout main
           # Merge upstream changes
           git merge upstream/main --allow-unrelated-histories -m "Merge upstream updates"
-          # Restore local workflows to avoid GitHub push restrictions
+          # Restore local workflow files to avoid GitHub push restrictions
           git reset HEAD .github/workflows/
           git checkout -- .github/workflows/
           # Create a timestamped tag
