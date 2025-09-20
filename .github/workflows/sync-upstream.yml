@@ -1,0 +1,110 @@
+name: Sync pfQuest-Epoch Updates
+
+on:
+  schedule:
+    - cron: '0 */3 * * *' # Runs every 3 hours
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout your private repo
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # 2. Configure Git
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      # 3. Add upstream and detect default branch
+      - name: Add upstream and detect default branch
+        id: detect_branch
+        run: |
+          git remote add upstream https://github.com/Bennylavaa/pfQuest-epoch.git || true
+          
+          # Fetch all branches from upstream
+          git fetch upstream --quiet || { echo "Failed to fetch upstream"; exit 1; }
+
+          # Detect default branch dynamically
+          DEFAULT_BRANCH=$(git remote show upstream | sed -n '/HEAD branch/s/.*: //p')
+
+          if [ -z "$DEFAULT_BRANCH" ]; then
+            echo "Could not detect default branch from upstream!"
+            exit 1
+          fi
+
+          echo "Upstream default branch detected: $DEFAULT_BRANCH"
+          echo "DEFAULT_BRANCH=$DEFAULT_BRANCH" >> $GITHUB_ENV
+
+      # 4. Sync main with upstream default branch, excluding .github directory
+      - name: Sync main with upstream
+        id: sync
+        run: |
+          git checkout main || { echo "Failed to checkout main"; exit 1; }
+
+          # Create a temporary branch for syncing
+          git checkout -b temp-sync || { echo "Failed to create temp branch"; exit 1; }
+          git reset --hard upstream/$DEFAULT_BRANCH || { echo "Failed to reset to upstream branch"; exit 1; }
+
+          # Remove upstream's .github directory
+          rm -rf .github || true
+
+          # Restore .github from private repo
+          git checkout origin/main -- .github || true
+
+          # Stage changes
+          git add . || true
+
+          # Check for meaningful changes excluding .github
+          if git diff --cached -- . ':!.github' | grep -q .; then
+            git commit -m "Sync with upstream ($DEFAULT_BRANCH), excluding .github directory" || { echo "Failed to commit changes"; exit 1; }
+            
+            # Merge back into main
+            git checkout main || { echo "Failed to checkout main"; exit 1; }
+            git merge temp-sync --no-edit || { echo "Failed to merge temp branch"; exit 1; }
+
+            # Push changes and create a tag
+            if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
+              TAG="v$(date +'%Y.%m.%d-%H%M')"
+              if git tag "$TAG" 2>/dev/null; then
+                git push origin main --force --tags || { echo "Failed to push changes"; exit 1; }
+                echo "SYNCED=true" >> $GITHUB_ENV
+                echo "TAG=$TAG" >> $GITHUB_ENV
+              else
+                echo "Tag $TAG already exists, skipping push"
+                echo "SYNCED=false" >> $GITHUB_ENV
+              fi
+            else
+              echo "No changes to sync"
+              echo "SYNCED=false" >> $GITHUB_ENV
+            fi
+          else
+            echo "No meaningful changes to sync (excluding .github)"
+            echo "SYNCED=false" >> $GITHUB_ENV
+          fi
+
+          # Clean up temporary branch safely
+          git checkout main || echo "Warning: Could not switch back to main"
+          git branch -D temp-sync || true
+
+      # 5. Discord Notification
+      - name: Send Discord Notification
+        if: env.SYNCED == 'true'
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          if [ -z "$DISCORD_WEBHOOK" ]; then
+            echo "Discord webhook URL is not set"
+            exit 1
+          fi
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "{\"username\":\"Addon Sync Bot\",\"embeds\":[{\"title\":\"pfQuest-Epoch Updates Detected\",\"description\":\"Private repo main branch synced to [Bennylavaa/pfQuest-epoch](https://github.com/Bennylavaa/pfQuest-epoch) branch \`${DEFAULT_BRANCH}\`.\",\"color\":3066993,\"fields\":[{\"name\":\"New Tag\",\"value\":\"${{ env.TAG }}\"}]}]}" \
+               "$DISCORD_WEBHOOK" || { echo "Failed to send Discord notification"; exit 1; }
