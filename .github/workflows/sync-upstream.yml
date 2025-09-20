@@ -45,7 +45,7 @@ jobs:
       - name: Merge updates & tag
         if: env.new_updates == 'true'
         run: |
-          git merge upstream/main --allow-unrelated-histories -X ours -- . ':(exclude).github/workflows/*'
+          git merge upstream/main --allow-unrelated-histories -X ours -- ':(exclude).github/workflows/'
           TAG=v$(date +'%Y.%m.%d-%H%M')
           git tag $TAG
           git push origin main --tags
