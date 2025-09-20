@@ -57,5 +57,5 @@ jobs:
         run: |
           curl -H "Content-Type: application/json" \
                -X POST \
-               -d "{\"username\":\"Addon Sync Bot\",\"embeds\":[{\"title\":\"LFG Updates Detected\",\"description\":\"New upstream updates were merged from [Bennylavaa/LFG](https://github.com/Bennylavaa/LFG).\",\"color\":3066993}]}\"" \
+               -d "{\"username\":\"Addon Sync Bot\",\"embeds\":[{\"title\":\"pfQuest Updates Detected\",\"description\":\"New upstream updates were merged from [Bennylavaa/LFG](https://github.com/Bennylavaa/LFG).\",\"color\":3066993}]}\"" \
                ${{ secrets.DISCORD_WEBHOOK }}
