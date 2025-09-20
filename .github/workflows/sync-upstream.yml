@@ -6,7 +6,7 @@ on:
   workflow_dispatch:       # Manual trigger
 
 permissions:
-  contents: write
+  contents: write  # Allows pushing commits and tags
 
 jobs:
   sync:
@@ -42,7 +42,6 @@ jobs:
             echo "new_updates=true" >> $GITHUB_ENV
           else
             echo "new_updates=false" >> $GITHUB_ENV
-          fi
 
       # 5. Merge updates, skip workflows, create tag
       - name: Merge updates & tag
@@ -51,8 +50,9 @@ jobs:
           git checkout main
           # Merge upstream changes
           git merge upstream/main --allow-unrelated-histories -m "Merge upstream updates"
-          # Restore local workflows to prevent GitHub push restrictions
-          git checkout HEAD -- .github/workflows/
+          # Restore local workflows to avoid GitHub push restrictions
+          git reset HEAD .github/workflows/
+          git checkout -- .github/workflows/
           # Create a timestamped tag
           TAG=v$(date +'%Y.%m.%d-%H%M')
           git tag $TAG
