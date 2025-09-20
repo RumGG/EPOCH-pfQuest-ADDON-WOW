@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: write  # Required to push commits and tags
-  workflows: write  # Required to update workflow files
 
 jobs:
   sync:
@@ -30,7 +29,7 @@ jobs:
       # 3. Add upstream remote
       - name: Add upstream
         run: |
-          git remote add upstream https://github.com/Bennylavaa/pfQuest-epoch.git
+          git remote add upstream https://github.com/Bennylavaa/pfQuest-epoch.git || true
           git fetch upstream
 
       # 4. Check for new commits
@@ -51,14 +50,16 @@ jobs:
         run: |
           git checkout main
           # Merge upstream changes
-          git merge upstream/main --allow-unrelated-histories -m "Merge upstream updates"
+          git merge upstream/main --allow-unrelated-histories -m "Merge upstream updates" || { echo "Merge failed"; exit 1; }
           # Restore local workflow files to avoid overwriting with upstream
-          git restore --source=HEAD -- .github/workflows/
+          git restore --source=HEAD -- .github/workflows/ || true
+          # Stage any changes
+          git add .github/workflows/ || true
+          # Commit changes (allow empty to ensure push even if no changes)
+          git commit --allow-empty -m "Preserve local workflow files after merge"
           # Create a timestamped tag
           TAG=v$(date +'%Y.%m.%d-%H%M')
           git tag $TAG
-          # Commit any changes (if needed)
-          git commit --allow-empty -m "Preserve local workflow files"
           # Push commits and tags
           git push origin main
           git push origin --tags
