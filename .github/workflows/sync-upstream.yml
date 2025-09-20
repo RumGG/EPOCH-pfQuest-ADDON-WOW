@@ -42,6 +42,7 @@ jobs:
             echo "new_updates=true" >> $GITHUB_ENV
           else
             echo "new_updates=false" >> $GITHUB_ENV
+          fi
 
       # 5. Merge updates, skip workflows, create tag
       - name: Merge updates & tag
