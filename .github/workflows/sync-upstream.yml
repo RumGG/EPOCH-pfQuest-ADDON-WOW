@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write  # Required to push commits and tags
+  workflows: write  # Required to update workflow files
 
 jobs:
   sync:
@@ -51,12 +52,13 @@ jobs:
           git checkout main
           # Merge upstream changes
           git merge upstream/main --allow-unrelated-histories -m "Merge upstream updates"
-          # Restore local workflow files to avoid GitHub push restrictions
-          git reset HEAD .github/workflows/
-          git checkout -- .github/workflows/
+          # Restore local workflow files to avoid overwriting with upstream
+          git restore --source=HEAD -- .github/workflows/
           # Create a timestamped tag
           TAG=v$(date +'%Y.%m.%d-%H%M')
           git tag $TAG
+          # Commit any changes (if needed)
+          git commit --allow-empty -m "Preserve local workflow files"
           # Push commits and tags
           git push origin main
           git push origin --tags
