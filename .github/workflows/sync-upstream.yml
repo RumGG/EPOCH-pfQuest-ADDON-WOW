@@ -5,17 +5,20 @@ on:
     - cron: '0 */3 * * *'  # Every 3 hours
   workflow_dispatch:       # Manual trigger
 
+permissions:
+  contents: write
+
 jobs:
   sync:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout your private repo with write access
+      # 1. Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}  # ensures push works
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       # 2. Configure Git
       - name: Configure Git
@@ -41,21 +44,28 @@ jobs:
             echo "new_updates=false" >> $GITHUB_ENV
           fi
 
-      # 5. Merge upstream changes and create version tag
+      # 5. Merge updates, skip workflows, create tag
       - name: Merge updates & tag
         if: env.new_updates == 'true'
         run: |
-          git merge upstream/main --allow-unrelated-histories -X ours -- ':(exclude).github/workflows/'
+          git checkout main
+          # Merge upstream changes
+          git merge upstream/main --allow-unrelated-histories -m "Merge upstream updates"
+          # Restore local workflows to prevent GitHub push restrictions
+          git checkout HEAD -- .github/workflows/
+          # Create a timestamped tag
           TAG=v$(date +'%Y.%m.%d-%H%M')
           git tag $TAG
-          git push origin main --tags
+          # Push commits and tags
+          git push origin main
+          git push origin --tags
           echo "TAG=$TAG" >> $GITHUB_ENV
 
-      # 6. Send Discord notification with upstream link
+      # 6. Send Discord Notification
       - name: Send Discord Notification
         if: env.new_updates == 'true'
         run: |
           curl -H "Content-Type: application/json" \
                -X POST \
-               -d "{\"username\":\"Addon Sync Bot\",\"embeds\":[{\"title\":\"pfQuest Updates Detected\",\"description\":\"New upstream updates were merged from [Bennylavaa/LFG](https://github.com/Bennylavaa/LFG).\",\"color\":3066993}]}\"" \
+               -d "{\"username\":\"Addon Sync Bot\",\"embeds\":[{\"title\":\"pfQuest Updates Detected\",\"description\":\"New upstream updates were merged from [Bennylavaa/pfQuest-epoch](https://github.com/Bennylavaa/pfQuest-epoch).\",\"color\":3066993}]}" \
                ${{ secrets.DISCORD_WEBHOOK }}
