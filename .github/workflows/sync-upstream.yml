@@ -44,19 +44,13 @@ jobs:
             echo "new_updates=false" >> $GITHUB_ENV
           fi
 
-      # 5. Merge updates, skip workflows, create tag
+      # 5. Merge updates, create tag
       - name: Merge updates & tag
         if: env.new_updates == 'true'
         run: |
           git checkout main
           # Merge upstream changes
           git merge upstream/main --allow-unrelated-histories -m "Merge upstream updates" || { echo "Merge failed"; exit 1; }
-          # Restore local workflow files to avoid overwriting with upstream
-          git restore --source=HEAD -- .github/workflows/ || true
-          # Stage any changes
-          git add .github/workflows/ || true
-          # Commit changes (allow empty to ensure push even if no changes)
-          git commit --allow-empty -m "Preserve local workflow files after merge"
           # Create a timestamped tag
           TAG=v$(date +'%Y.%m.%d-%H%M')
           git tag $TAG
