@@ -1,3 +1,3 @@
-ef4890b update lean turtle flank drop changed from epoch-drops #83
-6e3363f Add Ctrl+Click option for continent pin interaction for #88
-e906db5 Add meeting stone data and map config options
+8e65683 Dreams of Another Life fix
+67f6f5f My Kingdom for a Ship fix
+0c0e5e7 The Rite of the Medicant fix
