@@ -1,1 +1,4 @@
-c18ceb4 Remove Original The Ensorcelled Parchment
+be121fd Fix level checks for item drop quests
+6b8a166 Merge pull request #98 from BlacRyu/quest-filter-fix
+1c9aa2c Remove "if quest" checks since we already checked that the quest was valid
+5a6af2b Fixed some quest filters not being applied
