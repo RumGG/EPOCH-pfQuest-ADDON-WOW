@@ -1,1 +1,1 @@
-ada389a fix some epl quest issues
+93e5c3c Remove Anchorite Truuen TBC NPC
