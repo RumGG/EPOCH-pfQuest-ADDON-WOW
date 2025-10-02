@@ -1,1 +1,1 @@
-93e5c3c Remove Anchorite Truuen TBC NPC
+049024a Update quest and object data, remove holiday/tbc/pvp content
