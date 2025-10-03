@@ -1,1 +1,1 @@
-049024a Update quest and object data, remove holiday/tbc/pvp content
+111daa3 fix slavers chain, remove old attunement quest, fix pvp quests on map
