@@ -1,1 +1,1 @@
-111daa3 fix slavers chain, remove old attunement quest, fix pvp quests on map
+f434530 Commission for Bro'kin Horde only
