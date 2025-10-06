@@ -1,1 +1,2 @@
-f434530 Commission for Bro'kin Horde only
+ea292e1 remove weird Stranglethorn Fever quest and fix a horde only commision.
+5c9985b Add modern tracker, add coin quests, remove old systems
