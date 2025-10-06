@@ -1,2 +1,2 @@
-2625348 ooops proper fix for Commission for Fizzle Brassbolts
-22e72df Move hiding certain quests from world map to entire maps also fixed Commission for Fizzle Brassbolts
+8c1ed4b fix useable quest item
+3b9a57e add shagu's close quest system and make it workable
