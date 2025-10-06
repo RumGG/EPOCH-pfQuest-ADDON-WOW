@@ -1,3 +1,2 @@
-fd55566 fix Call to Skirmish Quests for factions
-0419a66 Magistrate Marduke is not a twin
-38383fa removed Libram Quests
+2625348 ooops proper fix for Commission for Fizzle Brassbolts
+22e72df Move hiding certain quests from world map to entire maps also fixed Commission for Fizzle Brassbolts
