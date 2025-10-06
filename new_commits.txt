@@ -1,2 +1,3 @@
-ea292e1 remove weird Stranglethorn Fever quest and fix a horde only commision.
-5c9985b Add modern tracker, add coin quests, remove old systems
+fd55566 fix Call to Skirmish Quests for factions
+0419a66 Magistrate Marduke is not a twin
+38383fa removed Libram Quests
