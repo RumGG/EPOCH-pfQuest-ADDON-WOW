@@ -1,2 +1,3 @@
-8c1ed4b fix useable quest item
-3b9a57e add shagu's close quest system and make it workable
+62e418f Remove unused WSG Quests
+90593b4 Fix Never Again
+ce4b58b Fix achievement tracker & remove some epl quests
