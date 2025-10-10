@@ -1,1 +1,2 @@
-6e3569c Item update
+6662be0 bump version
+934e271 Remove Taking Back Silithus
