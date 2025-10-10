@@ -1,2 +1,1 @@
-6662be0 bump version
-934e271 Remove Taking Back Silithus
+45cb4d3 added two new quests
