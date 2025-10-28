@@ -1,1 +1,2 @@
-0ced90b Argyle Wilkes the correct faction, Banner of the Stonemaul fixed
+28488e1 fix up version checker
+3f35402 Handful of fixes and cleanup
